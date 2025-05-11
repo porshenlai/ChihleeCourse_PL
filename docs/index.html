@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1"/>
+	<title>致理課程實作範例平台</title>
+	<script>
+	document.onload=function(){
+		let reqTA = document.body.querySelector("#請求"),
+			resTA = document.body.querySelector("#回應");
+		reqTA.value='{"ABC":123}';
+		resTA.value="";
+		
+		document.body.querySelector("#測試").addEventListener("click",async function(evt){
+			let response = await fetch("/APITEST",{
+				method:"POST",
+				body:reqTA.value
+			})
+			if (response.ok) {
+				let result = await response.json();
+				resTA.value=JSON.stringify(result,null,2);
+			} else {
+				alert("Fetch failed");
+			}
+		});
+		document.body.style.opacity=1;
+	}
+	</script>
+
+	<link rel="stylesheet" href="https://www.cyberpiers.com/piers/style.css"/>
+	<script src="http://g3c.cyberpiers.com:4780/piers/init.js"
+			PierEntrance="document.onload"
+			PierXMods="Widget,Session"></script>
+	<style type="text/css">
+		@media only screen and (orientation: portrait) {
+		}
+	</style>
+</head>
+<body style="opacity:0">
+	<h1>致理課程實作範例平台</h1>
+	<div style="text-align:center">
+		<textarea id="請求" rows="5" style="width:90%">{"ABC":123}</textarea>
+		<div><button id="測試">測試</button></div>
+		<textarea id="回應" rows="10" style="width:90%"></textarea>
+	</div>
+</body>
+</html>
