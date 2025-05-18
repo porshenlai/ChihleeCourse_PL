@@ -6,39 +6,6 @@
 	<title>致理課程實作範例平台</title>
 	<script>
 	document.onload=function(){
-		document.body.querySelector("#測試").addEventListener("click",async function(evt){
-			// 取得檢索條件
-			let qs = [... document.body.querySelector("#檢索條件").querySelectorAll("[v]")]
-					.reduce(function(r,e){
-						let vn = e.getAttribute("v");
-						r[vn] = e.value;
-						return r;
-					},{});
-			if("string" === typeof(qs.Trs)) qs.Trs=qs.Trs.split(",");
-			document.body.querySelector("#請求").value=JSON.stringify(qs,null,2);
-
-			// 時刻表檢索請求
-			let response = await fetch("/TRA",{
-				method:"POST",
-				body:JSON.stringify(qs)
-			})
-			if (response.ok) {
-				let result = await response.json();
-				document.body.querySelector("#回應").value=JSON.stringify(result,null,2);
-
-				// 輸出表格
-				let temp = document.body.querySelector("#樣版"),
-					rsts = document.body.querySelector("#結果");
-				while(rsts.firstChild) rsts.removeChild(rsts.firstChild);
-				result.D.reduce(function(r,v,i){
-					let nr = temp.cloneNode(true);
-					[... nr.querySelectorAll('[v]')].reduce(function(r,e){
-						e.textContent = v[e.getAttribute("v")];
-					}, {});
-					rsts.appendChild(nr);
-				},[]);
-			} else alert("Fetch failed");
-		});
 		document.body.style.opacity=1;
 	}
 	</script>
@@ -54,42 +21,9 @@
 </head>
 <body style="opacity:0">
 	<h1>致理課程實作範例平台</h1>
-	<div style="text-align:center">
-		<div id="檢索條件" style="text-align:center;">
-			起站:
-			<select v="F">
-				<option value="1020-板橋">板橋</option>
-				<option value="1040-樹林">樹林</option>
-				<option value="4080-嘉義">嘉義</option>
-			</select>
-			訖站:
-			<select v="T">
-				<option value="1020-板橋">板橋</option>
-				<option value="1040-樹林">樹林</option>
-				<option value="4080-嘉義">嘉義</option>
-			</select>
-			車種:
-			<input v="Trs" value="自強,新自強(3000),太魯閣,普悠瑪"></input>
-		</div>
-		<hr/>
-		<textarea id="請求" rows="5" style="width:90%">{"ABC":123}</textarea>
-		<div><button id="測試">測試</button></div>
-		<textarea id="回應" rows="10" style="width:90%"></textarea>
-		<hr/>
-		<table border="1" width="90%" align="center">
-			<tbody style="display:none">
-				<tr id="樣版">
-					<td v="ID"></td><td v="TT"></td><td v="SE"></td><td v="ST"></td><td v="ET"></td>
-				</tr>
-			</tbody>
-			<thead>
-				<tr>
-					<th>車次</th><th>車種</th><th>起訖</th><th>出發時間</th><th>抵達時間</th>
-				</tr>
-			</thead>
-			<tbody id="結果">
-			</tbody>
-		</table>
-	</div>
+	<ul>
+		<li><a href="TRA.html">臺鐵時刻表</a></li>
+		<li><a href="ABGame.html">猜字遊戲</a></li>
+	</ul>
 </body>
 </html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1"/>
+	<title>致理課程實作範例平台(猜字遊戲)</title>
+	<script>
+	document.onload=function(){
+		let GameSettings = {};
+		document.body.querySelector("#新遊戲")
+		.addEventListener("click",async function(evt){
+			let args = [... document.body.querySelectorAll("#遊戲設定 input[v]")]
+			.reduce(function(r,e){
+				r[e.getAttribute("v")] = e.value;
+				return r;
+			},{});
+			let response = await fetch("/ABGame", {
+				method: "POST",
+				body: JSON.stringify(args)
+			});
+			GameSettings.CNT = parseInt(args.CNT);
+			GameSettings.CS = args.CS;
+			GameSettings.GCNT = 0;
+			if (response.ok) {
+				let result = await response.json();
+				GameSettings.SID = result.SID;
+				document.body.querySelector("#回應").value="啟動新遊戲("+GameSettings.SID+")\n";
+			}
+		});
+		document.body.querySelector("#猜字")
+		.addEventListener("click",async function(evt){
+			let guess = this.parentNode.querySelector("input").value;
+			if (guess.length !== GameSettings.CNT)
+				return alert("一次要猜"+GameSettings.CNT+"個字");
+			let response = await fetch("/ABGame", {
+				method: "POST",
+				body: JSON.stringify({ SID: GameSettings.SID, GS: guess })
+			});
+			if (response.ok) {
+				let result = await response.json();
+				GameSettings.GCNT+=1;
+				document.body.querySelector("#回應").value+="猜第"+GameSettings.GCNT+"次:"+guess+"=>"+result.D[0]+"A"+result.D[1]+"B\n";
+			}
+		});
+		document.body.style.opacity=1;
+	}
+	</script>
+
+	<link rel="stylesheet" href="https://www.cyberpiers.com/piers/style.css"/>
+	<script src="http://g3c.cyberpiers.com:4780/piers/init.js"
+			PierEntrance="document.onload"
+			PierXMods="Widget,Session"></script>
+	<style type="text/css">
+		@media only screen and (orientation: portrait) {
+		}
+	</style>
+</head>
+<body style="opacity:0">
+	<h1>致理課程實作範例平台(AB遊戲)</h1>
+	<div style="text-align:center">
+		<div id="遊戲設定" style="text-align:center;">
+			猜幾個字:<input v="CNT" type="number" value="4"></input>
+			猜哪些字:<input v="CS" type="text" value="0123456789"></input>
+			<button id="新遊戲">開新遊戲</button>
+		</div>
+		<hr/>
+		<div>
+			<input type="text"></input>
+			<button id="猜字">猜字</button>
+		</div>
+		<textarea id="回應" rows="10" style="width:90%"></textarea>
+		<hr/>
+		<table border="1" width="90%" align="center">
+			<tbody style="display:none">
+				<tr id="樣版">
+					<td v="ID"></td><td v="TT"></td><td v="SE"></td><td v="ST"></td><td v="ET"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
