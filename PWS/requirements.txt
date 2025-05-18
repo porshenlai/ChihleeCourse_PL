@@ -2,4 +2,6 @@ aiohttp
 aiofiles
 aio-request
 pycryptodome
-
+tz
+pandas
+lxml
