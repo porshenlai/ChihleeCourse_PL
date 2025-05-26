@@ -3,6 +3,9 @@ from pytz import timezone
 from datetime import datetime
 from pandas import read_html
 from urllib.parse import urlencode
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 class 臺鐵:
 	"""
