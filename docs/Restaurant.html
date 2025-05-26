@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1"/>
-	<title>致理課程實作範例平台(臺鐵時刻表)</title>
+	<title>致理課程實作範例平台(點餐)</title>
 	<script>
 	document.onload=function(){
 		document.body.querySelector("#試算").addEventListener("click",async function(evt){
@@ -27,14 +27,26 @@
 			if (response.ok) {
 				let result = await response.json();
 				document.body.querySelector("#回應").value=JSON.stringify(result,null,2);
-				qs.Cost = result.D;
+				qs = Object.assign(qs,result.D);
 				[... document.body.querySelectorAll("#結果 [v]")].reduce(function(r,v){
 					console.log(v,qs);
 					v.textContent = qs[v.getAttribute("v")];
 				},undefined);
 			} else alert("Fetch failed");
 		});
-		document.body.style.opacity=1;
+		(async function(){
+			let menu = await fetch("/Restaurant",{
+				method:"POST",
+				body:JSON.stringify({"請求":"菜單"})
+			})
+			if (menu.ok) {
+				menu = (await menu.json());
+				if (menu.R!=="OK") return;
+				menu = menu.D;
+				console.log(menu);
+			}
+			document.body.style.opacity=1;
+		})();
 	}
 	</script>
 
@@ -68,7 +80,7 @@
 		<textarea id="回應" rows="10" style="width:90%"></textarea>
 		<hr/>
 		<div id="結果" style="text-align:center;">
-				<span v="Area"></span>地區，車行<span v="Dist"></span>公里，停等<span v="Wait"></span>秒。需支付費用<span v="Cost"></span>元。
+				總價:<span v="總價"></span>元 (含稅:<span v="含稅"></span>元)
 		</div>
 	</div>
 </body>

@@ -112,6 +112,7 @@ async def main() :
 		cafiles = (cfg["cert"], cfg["key"]) if "cert" in cfg and cfg["cert"] and "key" in cfg and cfg["key"] else None
 	)
 	print(f"Listen on : {cfg['port']}")
+	print(f"URL of main page is : http://127.0.0.1:{cfg['port']}")
 
 	signal(SIGINT, lambda sig,frame : ws.stop())
 	await ws.play()
