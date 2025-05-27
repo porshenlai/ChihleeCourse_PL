@@ -7,17 +7,17 @@
 	<script>
 	document.onload=function(){
 		document.body.querySelector("#試算").addEventListener("click",async function(evt){
-			// 取得檢索條件
-			let qs = [... document.body.querySelector("#檢索條件").querySelectorAll("[v]")]
-					.reduce(function(r,e){
-						let vn = e.getAttribute("v");
-						r[vn] = e.value;
-						return r;
-					},{});
-			if("string" === typeof(qs.Trs)) qs.Trs=qs.Trs.split(",");
-			qs = {"訂單":[
-				{"名稱":"豆漿","數量":1,"選項":["不加豆漿"]}
-			]}
+			// 取得菜單 
+			let qs = {
+				"訂單":[... document.body.querySelectorAll('#菜單 [v="數量"]')].reduce(function(orders, qty){
+					if(parseInt(qty.value) > 0) orders.push({
+						"名稱":qty.parentNode.parentNode.querySelector('[v="名稱"]').textContent,
+						"選項":qty.parentNode.parentNode.querySelector('[v="選項"]').value.split(","),
+						"數量":parseInt(qty.value)
+					});
+					return orders
+				},[])
+			};
 			document.body.querySelector("#請求").value=JSON.stringify(qs,null,2);
 
 			let response = await fetch("/Restaurant",{
@@ -43,7 +43,24 @@
 				menu = (await menu.json());
 				if (menu.R!=="OK") return;
 				menu = menu.D;
-				console.log(menu);
+				menu = (function(result){
+					for(n in menu){
+						menu[n]["名稱"] = n;
+						result.push(menu[n]);
+					}	
+					return result;
+				})([]);
+				
+				let temp = document.body.querySelector("#菜單樣板").firstChild;
+				menu.reduce(function(tbl, row){
+					let nr = temp.cloneNode(true);
+					row["數量"] = row["數量"] || 0;
+					[... nr.querySelectorAll('[v]')].forEach(function(e){
+						e[e.tagName==="INPUT" || e.tagName==="SELECT" ? "value" : "textContent"] = row[e.getAttribute("v")];
+					});
+					tbl.appendChild(nr);
+					return tbl;
+				},document.body.querySelector("#菜單"));
 			}
 			document.body.style.opacity=1;
 		})();
@@ -60,19 +77,20 @@
 	</style>
 </head>
 <body style="opacity:0">
-	<h1>致理課程實作範例平台</h1>
+	<h1>致理課程實作範例平台 - 點餐</h1>
 	<div style="text-align:center">
-		<div id="檢索條件" style="text-align:center;">
-			地區:
-			<select v="Area">
-				<option value="台北">台北</option>
-				<option value="桃園">桃園</option>
-				<option value="高雄">高雄</option>
-			</select>
-			車行距離:
-			<input type="number" v="Dist" value="5.5"></input>
-			停等時間:
-			<input type="number" v="Wait" value="0"></input>
+		<div style="text-align:center;">
+			<table border="1" cellspacing="0" cellpadding="3" width="98%" align="center">
+				<tbody id="菜單樣板" style="display:none"><tr>
+					<td><input type="number" v="數量" step="1" min="0" value="0"></input>
+					<td v="名稱"></td>
+					<td v="價格"></td>
+					<td v="說明"></td>
+					<td><input type="text" v="選項"/></td>
+				</tr></tbody>
+				<tbody id="菜單">
+				</tbody>
+			</table>
 		</div>
 		<hr/>
 		<textarea id="請求" rows="5" style="width:90%"></textarea>
