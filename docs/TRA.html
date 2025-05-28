@@ -6,7 +6,7 @@
 	<title>致理課程實作範例平台(臺鐵時刻表)</title>
 	<script>
 	document.onload=function(){
-		document.body.querySelector("#測試").addEventListener("click",async function(evt){
+		document.body.querySelector("#查詢").addEventListener("click",async function(evt){
 			// 取得檢索條件
 			let qs = [... document.body.querySelector("#檢索條件").querySelectorAll("[v]")]
 					.reduce(function(r,e){
@@ -14,7 +14,10 @@
 						r[vn] = e.value;
 						return r;
 					},{});
-			if("string" === typeof(qs.Trs)) qs.Trs=qs.Trs.split(",");
+			qs.Trs = [... document.body.querySelector("#檢索條件").querySelectorAll('input[type="checkbox"]')].reduce(function(r,e){
+				if(e.checked) r.push(e.value);
+				return r;
+			},[]);
 			document.body.querySelector("#請求").value=JSON.stringify(qs,null,2);
 
 			// 時刻表檢索請求
@@ -55,25 +58,47 @@
 <body style="opacity:0">
 	<h1>致理課程實作範例平台</h1>
 	<div style="text-align:center">
-		<div id="檢索條件" style="text-align:center;">
-			起站:
-			<select v="F">
-				<option value="1020-板橋">板橋</option>
-				<option value="1040-樹林">樹林</option>
-				<option value="4080-嘉義">嘉義</option>
-			</select>
-			訖站:
-			<select v="T">
-				<option value="1020-板橋">板橋</option>
-				<option value="1040-樹林">樹林</option>
-				<option value="4080-嘉義">嘉義</option>
-			</select>
-			車種:
-			<input v="Trs" value="自強,自強(3000),太魯閣,普悠瑪"></input>
+		<div id="檢索條件" style="text-align:left;padding:1% 2%;">
+			<div>
+				起站:
+				<select v="F">
+					<option value="1000-臺北">臺北</option>
+					<option value="1020-板橋">板橋</option>
+					<option value="1040-樹林">樹林</option>
+					<option value="3300-臺中">臺中</option>
+					<option value="4080-嘉義">嘉義</option>
+					<option value="4220-臺南">臺南</option>
+					<option value="4400-高雄">高雄</option>
+					<option value="7000-花蓮">花蓮</option>
+					<option value="6000-臺東">臺東</option>
+				</select>
+				訖站:
+				<select v="T">
+					<option value="1000-臺北">臺北</option>
+					<option value="1020-板橋">板橋</option>
+					<option value="1040-樹林">樹林</option>
+					<option value="3300-臺中">臺中</option>
+					<option value="4080-嘉義">嘉義</option>
+					<option value="4220-臺南">臺南</option>
+					<option value="4400-高雄">高雄</option>
+					<option value="7000-花蓮">花蓮</option>
+					<option value="6000-臺東">臺東</option>
+				</select>
+			</div>
+			<div>
+				車種:
+				<input type="checkbox" value="自強" checked/>自強
+				<input type="checkbox" value="自強(3000)" checked/>自強(3000)
+				<input type="checkbox" value="太魯閣" checked/>太魯閣
+				<input type="checkbox" value="普悠瑪" checked/>普悠瑪
+				<input type="checkbox" value="莒光"/>莒光
+				<input type="checkbox" value="區間快"/>區間快
+				<input type="checkbox" value="區間"/>區間
+			</div>
 		</div>
 		<hr/>
 		<textarea id="請求" rows="5" style="width:90%">{"ABC":123}</textarea>
-		<div><button id="測試">測試</button></div>
+		<div><button id="查詢">查詢</button></div>
 		<textarea id="回應" rows="10" style="width:90%"></textarea>
 		<hr/>
 		<table border="1" width="90%" align="center">

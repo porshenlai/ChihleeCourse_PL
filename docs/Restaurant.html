@@ -10,11 +10,15 @@
 			// 取得菜單 
 			let qs = {
 				"訂單":[... document.body.querySelectorAll('#菜單 [v="數量"]')].reduce(function(orders, qty){
-					if(parseInt(qty.value) > 0) orders.push({
-						"名稱":qty.parentNode.parentNode.querySelector('[v="名稱"]').textContent,
-						"選項":qty.parentNode.parentNode.querySelector('[v="選項"]').value.split(","),
-						"數量":parseInt(qty.value)
-					});
+					if(parseInt(qty.value) > 0)
+						orders.push({
+							"名稱":qty.parentNode.parentNode.querySelector('[v="名稱"]').textContent,
+							"選項":[... qty.parentNode.parentNode.querySelectorAll('[v="選項"] input[type="checkbox"]')].reduce(function(r,e){
+								if (e.checked) r.push(e.value);
+								return r;
+							},[]),
+							"數量":parseInt(qty.value)
+						});
 					return orders
 				},[])
 			};
@@ -56,7 +60,13 @@
 					let nr = temp.cloneNode(true);
 					row["數量"] = row["數量"] || 0;
 					[... nr.querySelectorAll('[v]')].forEach(function(e){
-						e[e.tagName==="INPUT" || e.tagName==="SELECT" ? "value" : "textContent"] = row[e.getAttribute("v")];
+						let n = e.getAttribute("v");
+						if(n==="選項")
+							e.innerHTML=row[n].reduce(function(rs,v){
+								return rs+'<input type="checkbox" value="'+v+'"/>'+v;
+							},"");
+						else
+							e[e.tagName==="INPUT" || e.tagName==="SELECT" ? "value" : "textContent"] = row[n];
 					});
 					tbl.appendChild(nr);
 					return tbl;
@@ -86,7 +96,7 @@
 					<td v="名稱"></td>
 					<td v="價格"></td>
 					<td v="說明"></td>
-					<td><input type="text" v="選項"/></td>
+					<td><div v="選項"></div></td>
 				</tr></tbody>
 				<tbody id="菜單">
 				</tbody>
