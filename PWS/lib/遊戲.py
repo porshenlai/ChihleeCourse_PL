@@ -1,9 +1,21 @@
 import random
 
+class 猜範圍 :
+    def __init__ (self, Min=0, Max=100) :
+        self.目標 = random.randint(Min, Max)
+        self.範圍 = (Min, Max);
+    def guess (self, val) :
+        if val < self.範圍[0] or  val > self.範圍[1] :
+            return None
+        if val == self.目標 :
+            return (val,self.目標)
+        self.範圍 = (self.範圍[0],val) if self.目標 < val else (val,self.範圍[1])
+        return self.範圍
+
 class 猜數字 :
 	"""
-	猜幾個字 = 2 #@param{type:"slider","min":1,"max":8}
-	可猜的字 = "0123456789abcdef" #@param{type:"string"}
+	猜幾個字 = 2
+	可猜的字 = "0123456789abcdef"
 	遊戲 = 猜數字(猜幾個字,可猜的字)
 	遊戲.挑戰()
 	"""
